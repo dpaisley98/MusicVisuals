@@ -27,7 +27,8 @@ public abstract class GameObject {
 
     void update(){
 
-        direction = PVector.fromAngle(rotation - DavidsGame.HALF_PI);
+        direction.x = DavidsGame.sin(rotation);
+        direction.y =  - DavidsGame.cos(rotation);
         right = PVector.fromAngle(rotation);
 
     }
@@ -35,6 +36,8 @@ public abstract class GameObject {
     boolean collides(GameObject object){
 
         float combW = halfW + object.halfW;
+        System.out.println("ROCKET X: " + position.x + "ROCKET Y: " + position.y);
+        System.out.println("PLAYER X: " + object.position.x + "PLAYER Y: " + object.position.y);
 
         return PVector.dist(position, object.position) < combW;
     }
@@ -42,9 +45,9 @@ public abstract class GameObject {
     boolean environmentCollides(float x, float y, float surfaceW){
 
         PVector p = new PVector(x,y);
-        float combW = halfW + surfaceW;
-
-        return PVector.dist(p, position) < combW;
+        float combW = w + surfaceW;
+        //(b.posX > (n - m/2)&& b.posX < (n+ m/2)) && (b.posY > (z-l/2) && b.posY < z + l/2)
+        return PVector.dist(position, p) < combW;
     }
 
     public abstract void load();

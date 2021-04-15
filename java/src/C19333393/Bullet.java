@@ -13,6 +13,7 @@ public class Bullet extends GameObject{
         lifetime = 5;
         timeAlive = 0;
         w = 10;
+        halfW = w/2;
     }
 
     public void render(){

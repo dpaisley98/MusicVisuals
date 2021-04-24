@@ -6,12 +6,13 @@ import processing.core.PImage;
 
 public class Player extends GameObject {
     boolean inAir;
-    boolean hasDoubleJumped;
+    boolean canDoubleJump;
     boolean isShooting;
     float grav, terminalVel;
     float fireRate;
     float airFriction, friction;
     float timer;
+    float prevX, prevY;
     
     
 
@@ -23,20 +24,23 @@ public class Player extends GameObject {
 
     public Player(float x, float y, float speed, DavidsGame game) {
         super(x, y, speed, game, 0);
-        inAir = false;
-        isShooting = false;
-        grav = 2;
-        terminalVel = 75;
-        fireRate = 5.0f;
-        friction = .1f;
-        airFriction = .001f;
-        timer = 0;
+        this.inAir = false;
+        this.isShooting = false;
+        this.grav = 2;
+        this.terminalVel = 40;
+        this.fireRate = 5.0f;
+        this.friction = .1f;
+        this.airFriction = .001f;
+        this.timer = 0;
         
         loadImages();
-        w = threads.width*.2f;
-        h = body.height*.2f;
-        halfW = w/2;
-        halfH = h/2;
+        this.w = threads.width*.2f;
+        this.h = body.height*.2f;
+        this.halfW = w/2;
+        this.halfH = h/2;
+        this.prevX = position.x;
+        this.prevY = position.y;
+
     }//end constructor
 
     public void load(){
@@ -124,28 +128,22 @@ public class Player extends GameObject {
 
         }//end if statement 
 
-
-        if(isShooting && inAir){
-
-            direction.x = - DavidsGame.sin(rotation);
-            direction.y =   DavidsGame.cos(rotation);
-
-            position.x += direction.x * (25 + grav);
-            position.y += direction.y * (50 + grav);
-
-            timer = 25;
-            speed = 0;
-
-        }//end if statement
-
-
-
         float angle = DavidsGame.atan2(position.x+(body.width*.4f)-game.mouseX, position.y-(body.height*.1f)-game.mouseY);
         rotation = -angle;
 
         
         gravity();
         shoot();
+
+        if(isShooting && inAir){
+
+            recoilFlight();
+        }//end if statement
+        
+        if((game.frameCount % 2) == 0){
+            prevX = position.x;
+            prevY = position.y;
+        }
     }
     
 
@@ -160,23 +158,40 @@ public class Player extends GameObject {
 
 
     void shoot(){
-        if (game.mousePressed && (game.frameCount % fireRate) == 0)
-        {
-            float dist = 10;
+        if (game.mousePressed){
             isShooting = true;
-            float scaleW = body.width/2;
-            float scaleH = body.height/2;
-            
-            Bullet b = new Bullet(position.x + (direction.x * dist)+(body.width*.4f), position.y + (direction.y * dist)-(body.height*.1f), 
-            10, game, scaleW, scaleH, rotation);
-            
-            game.bullets.add(b);
-            game.children.add(b);
+            if((game.frameCount % fireRate) == 0){
+                float dist = 10;
+               
+                float scaleW = body.width/2;
+                float scaleH = body.height/2;
+                
+                Bullet b = new Bullet(position.x + (direction.x * dist)+(body.width*.4f), position.y + (direction.y * dist)-(body.height*.1f), 
+                10, game, scaleW, scaleH, rotation);
+                
+                game.bullets.add(b);
+                game.children.add(b);
+                terminalVel = 20;
+            }
         }else{
 
             isShooting = false;
+            terminalVel = 60;
         }
     }//end shooting method
+
+
+    void recoilFlight(){
+
+        direction.x = - DavidsGame.sin(rotation);
+        direction.y =   DavidsGame.cos(rotation);
+
+        position.x += direction.x * (speed);
+        position.y += direction.y * ((grav * speed));
+
+        timer = 25;
+
+    }//end recoil method
 
 
     public void land(float f) {

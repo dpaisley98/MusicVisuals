@@ -2,6 +2,7 @@ package C19333393;
 
 import java.util.ArrayList;
 import ie.tudublin.*;
+import processing.core.PImage;
 
 public class DavidsGame extends Visual{    
     boolean[] keys = new boolean[1024];
@@ -10,7 +11,7 @@ public class DavidsGame extends Visual{
     ArrayList<Rocket> rockets = new ArrayList<>();
     ArrayList<GameObject> children = new ArrayList<>();
     boolean test = false;
-
+    PImage img;
     float c, z, n, m, l;
     //WaveForm wf;
     //AudioBandsVisual abv;
@@ -19,7 +20,7 @@ public class DavidsGame extends Visual{
         size(1024, 500);
         
         // Use this to make fullscreen
-        //fullScreen();
+        fullScreen();
 
         // Use this to make fullscreen and use P3D for 3D graphics
         //fullScreen(P3D, SPAN); 
@@ -29,11 +30,12 @@ public class DavidsGame extends Visual{
         startMinim();
                 
         // Call loadAudio to load an audio file to process 
-        //loadAudio("heroplanet.mp3");   
+        loadAudio("AlmostEvil.mp3");
+        getAudioPlayer().play();
 
         //controll = ControlIO.getInstance(this);
         // Call this instead to read audio from the microphone
-        startListening(); 
+        //startListening(); 
         p = new Player(width / 2, height / 2, 5, this);
         //wf = new WaveForm(this);
         //abv = new AudioBandsVisual(this);
@@ -43,15 +45,18 @@ public class DavidsGame extends Visual{
         m = 30;
         l=  height/5;
 
-        spawnRockets();
+        img = loadImage("rocket1.png");
+        img.resize((int)(img.width*.2f), (int)(img.height*.2f));
+
+        //spawnRockets();
     }
 
     private void spawnRockets() {
-        for(int i = 1; i<10; i++){
-            Rocket r = new Rocket(width*.1f*i, 0, 2, this, 0, p);
-            rockets.add(r);
-            children.add(r);
-        }
+
+        Rocket r = new Rocket(random(width), random(height/2), 4, this, 0, p);
+        rockets.add(r);
+        children.add(r);
+        
     }
 
     public void draw(){
@@ -74,8 +79,12 @@ public class DavidsGame extends Visual{
         //abv.render();
         cursor(CROSS);
         stroke(255);
-        
-        for(int i = bullets.size() - 1; i >= 0; i--){
+
+        float[] bands = getSmoothedBands();
+        float h = bands[4];
+
+
+        /*for(int i = bullets.size() - 1; i >= 0; i--){
             Bullet b = bullets.get(i);
             b.render();
             b.update();
@@ -85,12 +94,20 @@ public class DavidsGame extends Visual{
             Rocket r = rockets.get(i);
             r.render();
             r.update();
+
+
             if(r.collides(p)){
                 test = true;
                 rockets.remove(i);
             }
-        }
+        }*/
 
+        for(int i = children.size() - 1; i >= 0; i--){
+            GameObject o = children.get(i);
+            o.render();
+            o.update();
+        }//end loop to render objects
+        
         for(int i = children.size() - 1; i >= 0; i--){
             GameObject o = children.get(i);
             if(o instanceof Bullet){
@@ -104,11 +121,13 @@ public class DavidsGame extends Visual{
             }
         }
            
-    
-
         
         p.update();
         p.render();
+        System.out.println("AMP "+ getSmoothedAmplitude()*100);
+        if((h)>120 && (frameCount % 30) == 0){
+            spawnRockets();
+        }
 
        // checkCollisions();
 
@@ -143,7 +162,7 @@ public class DavidsGame extends Visual{
             p.position.y -=p.grav;
         }
         for (Bullet b : bullets) {
-            System.out.println("GREGDRGDGRDNYHNHNHNH " + b.position.x +" " + b.position.y);
+            //System.out.println("GREGDRGDGRDNYHNHNHNH " + b.position.x +" " + b.position.y);
             
             if(b.environmentCollides(n, z, m) ){
                 c = 0;

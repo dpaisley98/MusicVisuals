@@ -32,7 +32,7 @@ public class RotatingAudioBands extends Visual {
         setFrameSize(256);
 
         startMinim();
-        loadAudio("heroplanet.mp3");
+        loadAudio("AlmostEvil.mp3");
         getAudioPlayer().play();
         //startListening(); 
         
@@ -72,10 +72,11 @@ public class RotatingAudioBands extends Visual {
         {
             float theta = map(i, 0, bands.length, 0, TWO_PI);
 
-            stroke(map(i, 0, bands.length, 0, 255), 255, 255);
+            stroke(map(4, 0, bands.length, 0, 255), 255, 255);
             float x = sin(theta) * radius;
             float z = cos(theta) * radius;
-            float h = bands[i];
+            float h = bands[4];
+            System.out.println(h);
             pushMatrix();
             translate(x, - h / 2 , z);
             rotateY(theta);

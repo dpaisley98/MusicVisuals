@@ -38,22 +38,32 @@ public class Bullet extends GameObject{
 
         if (timeAlive > lifetime){
             game.bullets.remove(this);
+            game.children.remove(this);
+
         }
         if (position.x < 0){
           //  x = yasc.width;
             game.bullets.remove(this);
+            game.children.remove(this);
+
         }
         if (position.x > game.width){
         //    x = 0;
             game.bullets.remove(this);
+            game.children.remove(this);
+
         }
         if (position.y < 0 ){
         //    y = yasc.height;
             game.bullets.remove(this);
+            game.children.remove(this);
+
         }
         if (position.y > game.height){
         //    y = 0;
             game.bullets.remove(this);
+            game.children.remove(this);
+
         }
 
        // yasc.line(posX, posY-5, posX, posY+5);

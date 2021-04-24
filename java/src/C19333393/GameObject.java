@@ -13,14 +13,14 @@ public abstract class GameObject {
 
     
     public GameObject(float x, float y, float speed, DavidsGame game, float rotation) {
-        position = new PVector(x, y);
-        direction = new PVector(0, -1);
-        right = new PVector(1, 0);
+        this.position = new PVector(x, y);
+        this.direction = new PVector(0, -1);
+        this.right = new PVector(1, 0);
         this.rotation = rotation;
-        halfW = w/2;
-        halfH = h/2;
+        this.halfW = w/2;
+        this.halfH = h/2;
         this.speed = speed;
-        isAlive = true;
+        this.isAlive = true;
         this.game = game;
     }
 
@@ -50,7 +50,111 @@ public abstract class GameObject {
         return PVector.dist(position, p) < combW;
     }
 
+    
+
     public abstract void load();
     public abstract void render();
+
+
+    public PVector getPosition() {
+        return position;
+    }
+
+
+    public void setPosition(PVector position) {
+        this.position = position;
+    }
+
+
+    public PVector getDirection() {
+        return direction;
+    }
+
+
+    public void setDirection(PVector direction) {
+        this.direction = direction;
+    }
+
+
+    public float getRotation() {
+        return rotation;
+    }
+
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+
+    public float getW() {
+        return w;
+    }
+
+
+    public void setW(float w) {
+        this.w = w;
+    }
+
+
+    public float getH() {
+        return h;
+    }
+
+
+    public void setH(float h) {
+        this.h = h;
+    }
+
+
+    public float getHalfW() {
+        return halfW;
+    }
+
+
+    public void setHalfW(float halfW) {
+        this.halfW = halfW;
+    }
+
+
+    public float getHalfH() {
+        return halfH;
+    }
+
+
+    public void setHalfH(float halfH) {
+        this.halfH = halfH;
+    }
+
+
+    public float getSpeed() {
+        return speed;
+    }
+
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+
+    public DavidsGame getGame() {
+        return game;
+    }
+
+
+    public void setGame(DavidsGame game) {
+        this.game = game;
+    }
+
+    
 
 }

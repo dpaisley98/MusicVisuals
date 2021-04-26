@@ -18,6 +18,7 @@ public class Bullet extends GameObject{
 
     public void render(){
         game.stroke(0,0,0);
+        game.strokeWeight(3);
         game.pushMatrix();
         game.translate(position.x, position.y);
         game.rotate(rotation);
@@ -64,6 +65,11 @@ public class Bullet extends GameObject{
             game.bullets.remove(this);
             game.children.remove(this);
 
+        }
+
+        if(!(isAlive)){
+            game.bullets.remove(this);
+            game.children.remove(this);
         }
 
        // yasc.line(posX, posY-5, posX, posY+5);

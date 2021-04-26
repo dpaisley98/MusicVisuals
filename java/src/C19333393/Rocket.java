@@ -14,14 +14,11 @@ public class Rocket extends GameObject{
     public Rocket(float x, float y, float speed, DavidsGame game, float rotation, Player p) {
         super(x, y, speed, game, rotation);
         this.p = p;
-        loadImages();
         //followOffSet = posi
 
-        moveToX = p.position.x + p.w;
-        moveToY = p.position.y + p.getHeight();
-        diffX = moveToX - position.x;
-        diffY = moveToY - position.y;
-        rotation = (float)DavidsGame.atan2(diffY, diffX);
+        update();
+        loadImages();
+
 
     }//end constructor
     
@@ -54,8 +51,8 @@ public class Rocket extends GameObject{
 
     public void update(){
         
-        moveToX = DavidsGame.lerp(p.prevX + p.w, p.position.x, .01f);
-        moveToY = DavidsGame.lerp(p.prevY, p.position.y, .01f);;
+        moveToX = DavidsGame.lerp(p.position.x + p.w, p.position.x, .01f);
+        moveToY = DavidsGame.lerp(p.position.y, p.position.y, .01f);
 
         diffX = moveToX - position.x;
         diffY = moveToY - position.y;

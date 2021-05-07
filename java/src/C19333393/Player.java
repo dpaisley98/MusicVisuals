@@ -1,125 +1,185 @@
 package C19333393;
 
+
 import processing.core.PImage;
-//import processing.core.PApplet;
-//import processing.core.PVector;
 
 public class Player extends GameObject {
-    boolean inAir;
-    boolean canDoubleJump;
-    boolean isShooting, isMoving;
-    float grav, terminalVel, velocity;
-    float acceleration, maxAcceleration;
-    float jumpHeight;
-    float fireRate;
-    float airFriction, friction;
-    float timer;
-    float prevX, prevY;
-    float scale;
+    private boolean inAir;
+    private boolean jump;
+    private boolean isShooting, isMovingLeft, isMovingRight;
+
+    private float grav, terminalVel, velocity;
+    private float acceleration, maxAcceleration;
+    private float jumpHeight, jumpPower;
+    private float fireRate;
+    private float timer;
+    private float scale;
     
-    
+    private PImage body;
+    private PImage threads[];
+    private PImage turret[];
+    private PImage backPack[];
 
-    PImage body;
-    PImage threads;
-    PImage turret;
-    PImage backPack;
+    private int delay = 0;
+    private int threadFrame, turretFrame, backPackFrame, in;
 
 
-    public Player(float x, float y, float speed, DavidsGame game, float scale) {
-        super(x, y, speed, game, 0);
+    public Player(float x, float y, float speed, DavidsGame game, float scale, int hp) {
+        super(x, y, speed, game, 0, hp);
+
         this.inAir = false;
         this.isShooting = false;
-        this.isMoving = false;
+        this.isMovingLeft = false;
+        this.isMovingRight = false;
+        this.jump = false; 
+
         this.grav = 2;
         this.terminalVel = 40;
         this.velocity = speed;
         this.acceleration = 0.2f;
         this.maxAcceleration = 8;
-        this.jumpHeight = 30;
+        this.jumpHeight = jumpPower = game.height *.03f;
+
         this.fireRate = 5.0f;
-        this.friction = .1f;
-        this.airFriction = .001f;
         this.timer = 0;
         this.scale = scale;
+        threadFrame = turretFrame = backPackFrame = in = 0;
+
         
         loadImages();
-        this.w = threads.width*.2f;
-        this.h = body.height*.2f;
-        this.halfW = w/2;
-        this.halfH = h/2;
-        this.prevX = position.x;
-        this.prevY = position.y;
+        setW(threads[0].width*.2f);
+        setH(body.height*.2f);
+        setHalfW(getW()/2);
+        setHalfH(getH()/2);
 
 
     }//end player constructor
 
 
     public void load(){
-        
 
-    }
+        if(isMovingLeft){
+            if(delay == 0){
+                threadFrame--;
+                if(threadFrame<0){
+                    threadFrame = threads.length-1;
+                }
+            }
+        }else if (isMovingRight){
+            if(delay == 0){
+                threadFrame = (threadFrame + 1) % threads.length;
+            }
+        }//else if statement to animate the tankl threads
+
+
+        if(isShooting){
+            if (delay == 0){
+                turretFrame = (turretFrame +1) % turret.length;
+            }
+        }//if statement to animate the turret
+
+
+        if(jump && in < 6){
+            if (delay == 0){
+                backPackFrame = (backPackFrame + 1) % turret.length;
+                in++;
+            }
+        }//animate thruster when the player jumps
+
+
+        delay = (delay + 1) % 3;
+
+    }//end method to animate the player
 
 
     void loadImages(){
+        threads = new PImage[8];
+        backPack = new PImage[4];
+        turret = new PImage[3];
 
-        game.imageMode(DavidsGame.CORNER);
-
-        body = game.loadImage("rBdy.png");
+        body = getGame().loadImage("rBdy.png");
         body.resize((int)(body.width*scale), (int)(body.height*scale));
         
-        threads = game.loadImage("threads1.png");
-        threads.resize((int)(threads.width*scale), (int)(threads.height*scale));
+        for(int i =0; i< threads.length ; i++){
+            threads[i] = getGame().loadImage("threads" + i + ".png");
+            threads[i].resize((int)(threads[i].width*scale), (int)(threads[i].height*scale));
+        }//end for loop to load the images for the tank threads
 
-        turret = game.loadImage("turretR1.png");
-        turret.resize((int)(turret.width*scale), (int)(turret.height*scale));
+        for(int i =0; i< turret.length ; i++){
+            turret[i] = getGame().loadImage("turretR" + i + ".png");
+            turret[i].resize((int)(turret[i].width*scale), (int)(turret[i].height*scale));
+        }//end for loop to load the images for the turret
 
-        backPack = game.loadImage("thruster0.png");
-        backPack.resize((int)(backPack.width*scale), (int)(backPack.height*scale));
+        for(int i =0; i< backPack.length ; i++){
+            backPack[i] = getGame().loadImage("thruster" + i + ".png");
+            backPack[i].resize((int)(backPack[i].width*scale), (int)(backPack[i].height*scale));
+        }//end for loop to load the images for the thruster pack
 
-    }
+
+    }//end loading images
 
 
     public void render(){
 
-        game.image(body, position.x, position.y);
-        game.image(threads, position.x-(body.width*.4f), position.y+(body.height*.9f));
-        game.image(backPack, position.x-(body.width*.2f) ,position.y+(body.height*.35f));
+        getGame().imageMode(DavidsGame.CORNER);
 
-        game.pushMatrix();
-        game.translate(position.x+(body.width*.4f), position.y-(body.height*.1f));
-        game.imageMode(DavidsGame.CENTER);
-        game.rotate(rotation);
-        game.image(turret, 0 ,0);
-        game.popMatrix();
 
-        game.imageMode(DavidsGame.CORNER);
+        getGame().image(body, getPosition().x, getPosition().y);
+        getGame().image(threads[threadFrame], getPosition().x-(body.width*.4f), getPosition().y+(body.height*.9f));
+        getGame().image(backPack[backPackFrame], getPosition().x-(body.width*.2f) ,getPosition().y+(body.height*.35f));
 
-    }
+
+        getGame().pushMatrix();
+        getGame().translate(getPosition().x+(body.width*.4f), getPosition().y-(body.height*.1f));
+        getGame().imageMode(DavidsGame.CENTER);
+        getGame().rotate(getRotation());
+        getGame().image(turret[turretFrame], 0 ,0);
+        getGame().popMatrix();
+
+
+        getGame().imageMode(DavidsGame.CORNER);
+
+    }//method to render the player 
 
 
     void update(){
+        if(getHp() <= 0){
+            setAlive(false);
+        }
 
-        float angle = DavidsGame.atan2(position.x+(body.width*.4f)-game.mouseX, position.y-(body.height*.1f)-game.mouseY);
-        rotation = -angle;
+        //code to rotate the player's turret based on the location of the mouse
+        float angle = DavidsGame.atan2(getPosition().x+(body.width*.4f) - getGame().mouseX, getPosition().y - (body.height*.1f) - getGame().mouseY);
+        setRotation(-angle);
 
-        direction.x = DavidsGame.sin(rotation);
-        direction.y =  - DavidsGame.cos(rotation);
+        getDirection().x = DavidsGame.sin(getRotation());
+        getDirection().y =  - DavidsGame.cos(getRotation());
         
-        if(game.checkKey('a') ||game.checkKey('A')){
-            position.x -= 1 + speed;
-            isMoving = true;
-        }
-        if(game.checkKey('d') ||game.checkKey('D')){
-            position.x += 1 + speed;
-            isMoving = true;
-        }
-        if(game.checkKey(' ') || inAir == true){
-            jump();
-        }
 
+        if(getGame().checkKey('a') || getGame().checkKey('A')){
+            getPosition().x -= 1 + getSpeed();
+            isMovingLeft = true;
+        }else{
+            isMovingLeft = false;
+        }//end the else if statement to see if the player is moving left
+
+        if(getGame().checkKey('d') || getGame().checkKey('D')){
+            getPosition().x += 1 + getSpeed();
+            isMovingRight = true;
+        }else{
+            isMovingRight = false;
+        }//end the else if statement to see if the player is moving right
+
+        if(getGame().checkKey(' ')){
+            jump = true;
+        }//end the else if statement to see if the player is jumping
+
+
+        jump();
         accelerate();
         gravity();
         shoot();
+        load();
+
 
         if(isShooting && inAir){
 
@@ -127,7 +187,7 @@ public class Player extends GameObject {
         }//end if statement
         
 
-        isMoving = false;
+        inAir=true;
     }//end update of player character
     
 
@@ -137,65 +197,70 @@ public class Player extends GameObject {
             velocity = terminalVel;
         }
 
-        position.y += velocity;
+        getPosition().y += velocity;
     }//end method to apply gravity to player
 
 
     void accelerate(){
-        if((game.frameCount % 25) == 0){
-            if(isMoving){
-                speed += acceleration;
+
+        if((getGame().frameCount % 25) == 0){
+            if(isMovingLeft || isMovingRight){
+                setSpeed(getSpeed() + acceleration);
                 acceleration += acceleration;
 
                 if(acceleration > 2){
                     acceleration = 2;
-                }
+                }//end if statement to ensure accelaration doesn't exceed 2
 
-                if (speed > maxAcceleration){
-                    speed = maxAcceleration;
-                }
+                if (getSpeed() > maxAcceleration){
+                    setSpeed(maxAcceleration);
+                }//end if to make sure the speed of the player doesn't exceed the max speed
+
             }else{
                 acceleration -= acceleration;
                 if(acceleration <= 0.2f){
                     acceleration = 0.2f;
                 }
-                speed = 5; 
-            }
-        }
+                setSpeed(5); 
+            }//end else if to check if the player has reached maximum speed
+        }//end if to make sure that the speed doesn't instanly accelerate immediately 
+
     }//end method to apply gravity to player
 
 
     void shoot(){
-        if (game.mousePressed){
+
+        if (getGame().mousePressed){
             isShooting = true;
-            if((game.frameCount % fireRate) == 0){
+            if((getGame().frameCount % fireRate) == 0){
                 float dist = 10;
                
                 float scaleW = body.width/2;
                 float scaleH = body.height/2;
                 
-                Bullet b = new Bullet(position.x + (direction.x * dist)+(body.width*.4f), position.y + (direction.y * dist)-(body.height*.1f), 
-                10, game, scaleW, scaleH, rotation);
+                Bullet b = new Bullet(getPosition().x + (getDirection().x * dist)+(body.width*.4f), getPosition().y + (getDirection().y * dist)-(body.height*.1f), 
+                10, getGame(), scaleW, scaleH, getRotation(), 1);
                 
-                game.bullets.add(b);
-                game.children.add(b);
+                getGame().bullets.add(b);
+                getGame().children.add(b);
                 terminalVel = 20;
             }
         }else{
 
             isShooting = false;
             terminalVel = 60;
-        }
+        }//end else if statement 
+
     }//end shooting method
 
 
     void recoilFlight(){
 
-        direction.x = - DavidsGame.sin(rotation);
-        direction.y =   DavidsGame.cos(rotation);
+        getDirection().x = - DavidsGame.sin(getRotation());
+        getDirection().y =   DavidsGame.cos(getRotation());
 
-        position.x += direction.x * (velocity);
-        position.y += direction.y * ((grav * velocity));
+        getPosition().x += getDirection().x * (velocity);
+        getPosition().y += getDirection().y * ((grav * velocity));
 
         timer = 25;
 
@@ -204,85 +269,102 @@ public class Player extends GameObject {
 
     void jump(){
 
-        timer++;
-        inAir = true;
+        
+        if(jump || (inAir && jump)){
+            timer++;
+            inAir = true;
 
-        if(!isShooting && timer <= jumpHeight){
-            position.y -= jumpHeight;
-        }
+            if(!isShooting && timer <= jumpHeight){
+                getPosition().y -= jumpHeight;
+            }
 
-    }
+        }//jump check to make sure the player is having its y values decreased over time
+
+
+    }//end jump method 
 
 
     public void land(float f) {
-        if(position.y + getHeight() >= f){
+
+        if(getBottom() >= f){
+
+            jump = false;
+            jumpHeight = jumpPower;
             inAir = false;
             timer = 0;
+            in = 0;
+            backPackFrame = 0;
             velocity = 0;
-            position.y= f - getHeight();
-            position.y -= grav;
-        }
-    }
+            getPosition().y = f - getHeight();
+            getPosition().y -= grav;
+
+        }//if statement that when the player hits land that the player own't fall through the map
+
+    }//method to allow the player to land
 
 
     public void tapTop(float f) {
-        if(position.y + getHeight() >= f){
-            position.y = f;
-            position.y -= grav;
+
+        if(getPosition().y  <= f){
+            getPosition().y = f;
+        }else if(isShooting && inAir){
+            getPosition().y += (grav * velocity);
         }
-    }
+
+    }//checks if the player has hit its head
 
 
     public void hitWall(float f, String s) {
-        speed = 5;
+        setSpeed(5);
 
         if(s == "RIGHT"){
-            position.x += 6;
+            getPosition().x += 6;
         }else if(s == "LEFT"){
-            position.x -= 6;
-        }
+            getPosition().x -= 6;
+        }//end else if statement to see if the player has hit the left or right side of a wall
 
         if(isShooting && inAir){
             if(s == "RIGHT"){
-                position.x = f + (position.x - getLeft());
-                position.x += velocity;
+                getPosition().x = f + (getPosition().x - getLeft());
+                getPosition().x += velocity;
             }else if(s == "LEFT"){
-                //position.x = f - (position.x - getLeft());
-                position.x = f - (getRight() - position.x);
-                position.x -= velocity;            
-            }
+                getPosition().x = f - (getRight() - getPosition().x);
+                getPosition().x -= velocity;            
+            }//end else if statement to see if the player has hit the left or right side of a wall
 
         }//end if to check if the robot is flying due to recoil
-    }
+
+    }//makes it so the player will hit a wall and not phase through
 
 
     public float getHeight() {
 
-        return  getBottom()-position.y;
-    }
+        return  getBottom()-getPosition().y;
+    }//end getter
 
 
     public float getBottom() {
         float bY,b,bH;
 
-        bY = position.y+(body.height*.85f);
-        bH = (threads.height);
+        bY = getPosition().y+(body.height*.85f);
+        bH = (threads[0].height);
         b = bY + bH; 
         return b;
-    }
+    }//end getter
 
 
     public float getLeft(){
-        float threadHW = (threads.width)/4;
+        float threadHW = (threads[0].width)/4;
 
-        return position.x - threadHW;
-    }
+        return getPosition().x - threadHW;
+    }//end getter
 
 
     public float getRight(){
-        float threadHW = (threads.width)*.75f;
+        float threadHW = (threads[0].width)*.75f;
 
-        return position.x + threadHW;
-    }
+        return getPosition().x + threadHW;
+    }//end getter
 
-}
+
+}//end player class

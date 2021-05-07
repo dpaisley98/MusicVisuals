@@ -3,16 +3,17 @@ package C19333393;
 import processing.core.PVector;
 
 public abstract class GameObject {
-    PVector position, direction;
-    float rotation;
-    float w, h;
-    float halfW, halfH;
-    float speed;
-    boolean isAlive;
-    DavidsGame game;
-
+    private PVector position, direction;
+    private float rotation;
+    private float w, h;
+    private float halfW, halfH;
+    private float speed;
+    private boolean isAlive;
+    private DavidsGame game;
+    private int hp, maxHp;
     
-    public GameObject(float x, float y, float speed, DavidsGame game, float rotation) {
+
+    public GameObject(float x, float y, float speed, DavidsGame game, float rotation, int hp) {
         this.position = new PVector(x, y);
         this.direction = new PVector(0, -1);
         this.rotation = rotation;
@@ -21,6 +22,7 @@ public abstract class GameObject {
         this.speed = speed;
         this.isAlive = true;
         this.game = game;
+        this.maxHp = this.hp = hp;
     }//end game object constructor
 
 
@@ -39,7 +41,6 @@ public abstract class GameObject {
     }//end method to check for any collision between two objects
 
 
-    public abstract void load();
     public abstract void render();
 
 
@@ -139,8 +140,20 @@ public abstract class GameObject {
     }//end getter
 
 
-    public void setGame(DavidsGame game) {
-        this.game = game;
+    public int getHp() {
+        return hp;
+    }//end getter
+
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }//end setter
 
+
+    public int getMaxHp() {
+        return maxHp;
+    }//end getter
+
+
+    
 }//end game object class

@@ -2,82 +2,52 @@ package C19333393;
 
 public class Bullet extends GameObject{
     
-    float lifetime, timeAlive;
-    float scaleW, scaleH;
-    float posX, posY;
+    private float lifetime, timeAlive;
 
-    public Bullet(float x, float y, float speed, DavidsGame game, float scaleW, float scaleH, float rotation) {
-        super(x, y, speed, game, rotation);
-        this.scaleW = scaleW;
-        this.scaleH = scaleH;
+
+    public Bullet(float x, float y, float speed, DavidsGame game, float scaleW, float scaleH, float rotation, int hp) {
+        super(x, y, speed, game, rotation, hp);
         lifetime = 5;
         timeAlive = 0;
-        w = 10;
-        halfW = w/2;
-    }
+        setW(10);
+        setHalfW(getW()/2);
+    }//end constructor
 
+    
     public void render(){
-        game.stroke(0,0,0);
-        game.strokeWeight(3);
-        game.pushMatrix();
-        game.translate(position.x, position.y);
-        game.rotate(rotation);
-        game.line(0, -5, 0, 5);
-        game.popMatrix();
-    }
+
+        getGame().stroke(0,0,0);
+        getGame().strokeWeight(3);
+        getGame().pushMatrix();
+        getGame().translate(getPosition().x, getPosition().y);
+        getGame().rotate(getRotation());
+        getGame().line(0, -5, 0, 5);
+        getGame().popMatrix();
+
+    }//method to render the bullets
+
 
     public void update(){
-        direction.x =  DavidsGame.sin(rotation);
-        direction.y =  - DavidsGame.cos(rotation);
+        getDirection().x =  DavidsGame.sin(getRotation());
+        getDirection().y =  - DavidsGame.cos(getRotation());
 
-        position.x += direction.x * (speed*4);
-        position.y += direction.y * (speed*4);
+        getPosition().x += getDirection().x * (getSpeed()*4);
+        getPosition().y += getDirection().y * (getSpeed()*4);
 
-        halfW = ((position.y + 5) - (position.y - 5))/2;
+        //setHalfW(((getPosition().y + 5) - (getPosition().y - 5))/2);
 
         timeAlive += (1 / 60.0f);
 
         if (timeAlive > lifetime){
-            game.bullets.remove(this);
-            game.children.remove(this);
+            setAlive(false);
+        }//if the bullet is around for too long it dies 
 
-        }
-        if (position.x < 0){
-          //  x = yasc.width;
-            game.bullets.remove(this);
-            game.children.remove(this);
+        if(!(isAlive())){
+            getGame().bullets.remove(this);
+            getGame().children.remove(this);
+        }//end if to delete the bullet once it exceeds bounds or "dies" 
 
-        }
-        if (position.x > game.width){
-        //    x = 0;
-            game.bullets.remove(this);
-            game.children.remove(this);
-
-        }
-        if (position.y < 0 ){
-        //    y = yasc.height;
-            game.bullets.remove(this);
-            game.children.remove(this);
-
-        }
-        if (position.y > game.height){
-        //    y = 0;
-            game.bullets.remove(this);
-            game.children.remove(this);
-
-        }
-
-        if(!(isAlive)){
-            game.bullets.remove(this);
-            game.children.remove(this);
-        }
-
-       // yasc.line(posX, posY-5, posX, posY+5);
+    }//end update
 
 
-    }
-
-    public void load(){}
-
-
-}
+}//end bullet class

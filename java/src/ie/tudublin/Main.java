@@ -1,8 +1,6 @@
 package ie.tudublin;
 
-import example.CubeVisual;
 import C19333393.DavidsGame;
-import example.RotatingAudioBands;
 
 public class Main
 {	

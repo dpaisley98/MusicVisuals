@@ -1,18 +1,14 @@
 package C19333393;
 
-import processing.core.PImage;
-import processing.core.PVector;
-
 public class Rocket extends GameObject{
     //global variables for this class
-    PImage body;
-    Player p;
-    PVector followOffSet;
-    float moveToX, moveToY;
-    float diffX, diffY;
+    private Player p;
+    private float moveToX, moveToY;
+    private float diffX, diffY;
 
-    public Rocket(float x, float y, float speed, DavidsGame game, float rotation, Player p) {
-        super(x, y, speed, game, rotation);
+
+    public Rocket(float x, float y, float speed, DavidsGame game, float rotation, Player p, int hp) {
+        super(x, y, speed, game, rotation, hp);
         this.p = p;
         //followOffSet = posi
 
@@ -22,68 +18,64 @@ public class Rocket extends GameObject{
 
     }//end constructor
     
-    public void load(){}//end load
 
     private void loadImages(){
-        game.imageMode(DavidsGame.CENTER);
+        getGame().imageMode(DavidsGame.CENTER);
 
-        body = game.loadImage("rocket1.png");
-        w = game.img.width;
-        h = game.img.height;
-        halfW = w/2;
-        halfH = h/2;
+        setW(getGame().img.width);
+        setH(getGame().img.height);
+        setHalfW(getW()/2);
+        setHalfH(getH()/2);
         //game.img.resize((int)(w), (int)(h));
 
-        game.imageMode(DavidsGame.CORNER);
+        getGame().imageMode(DavidsGame.CORNER);
 
     }//end load images
 
 
     public void render(){
 
-        game.pushMatrix();
-        game.translate(position.x, position.y);
-        game.rotate(rotation);
-        game.image(game.img, 0 ,0);
-        game.popMatrix();
+        getGame().pushMatrix();
+        getGame().translate(getPosition().x, getPosition().y);
+        getGame().rotate(getRotation());
+        getGame().image(getGame().img, 0 ,0);
+        getGame().popMatrix();
         
     }//end render
 
     public void update(){
         
-        moveToX = DavidsGame.lerp(p.position.x + p.w, p.position.x, .01f);
-        moveToY = DavidsGame.lerp(p.position.y, p.position.y, .01f);
+        //will calculate the value the rocket needs to move to by geting the value between the rocket and the player
+        moveToX = DavidsGame.lerp(p.getPosition().x + p.getW(), getPosition().x, .01f);
+        moveToY = DavidsGame.lerp(p.getPosition().y, getPosition().y, .01f);
 
-        diffX = moveToX - position.x;
-        diffY = moveToY - position.y;
+        diffX = moveToX - getPosition().x;
+        diffY = moveToY - getPosition().y;
        
         float angle = (float)DavidsGame.atan2(diffY, diffX);
-        rotation = angle;
-
-        
-        /*if(rotation < 0){
-            rotation = prevRotation;
-           // System.out.println("HTRSHGERSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG " + rotation);
-
-        }*/
-        //position = PVector.lerp(position, p.position, .01f);
-
+        setRotation(angle);
         
 
-        direction.x =  DavidsGame.cos(rotation);
-        direction.y =  DavidsGame.sin(rotation);
+        getDirection().x =  DavidsGame.cos(getRotation());
+        getDirection().y =  DavidsGame.sin(getRotation());
        
 
-        position.x += speed * direction.x;
-        position.y += speed * direction.y;
+        getPosition().x += getSpeed() * getDirection().x;
+        getPosition().y += getSpeed() * getDirection().y;
 
-        //System.out.println("ROTATION " + rotation);
-        //System.out.println("HTRSHGERSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG " + rotation * DavidsGame.PI / 180);
 
-        if(!isAlive){
-            game.rockets.remove(this);
-            game.children.remove(this);
-        }
+        if(getHp() < 1){
+            setAlive(false);
+        }//if the rocket loses all of its health it dies
+
+
+        if(!isAlive()){
+            getGame().rockets.remove(this);
+            getGame().children.remove(this);
+        }//delete the rocket if it is no longer alive
+
 
     }//end update
-}
+
+
+}//end rocket method
